@@ -1,26 +1,52 @@
-board = [['O' for _ in range(10)] for _ in range(10)]
+import random
+
+board_size = 5
+board = [['O' for _ in range(board_size)] for _ in range(board_size)]
+ships = [(1, 1), (2, 2), (3, 3)]
 
 def print_board(board):
     for row in board:
-        print(' '.join(row))
+        print(" ".join(row))
 
-def place_ship(board, row, col):
-    board[row][col] = 'S'
+def check_shot(row, col):
+    if (row, col) in ships:
+        return True
+    else:
+        return False
 
-place_ship(board, 0, 0)
+def computer_shot():
+    row = random.randint(0, board_size - 1)
+    col = random.randint(0, board_size - 1)
+    return row, col
+
+def player_shot():
+    row = int(input("выбери строку: ")) - 1
+    col = int(input("выбери столбец: ")) - 1
+    return row, col
 
 while True:
+    print("твоя очередь:")
     print_board(board)
-    
-    guess_row = int(input("Укажите номер строки (0-9): "))
-    guess_col = int(input("Укажите номер столбца (0-9): "))
-    
-    if board[guess_row][guess_col] == 'S':
-        print("в яблочко!")
-        board[guess_row][guess_col] = 'X'
+    row, col = player_shot()
+    if check_shot(row, col):
+        print("попадание!")
+        board[row][col] = 'X'
+        ships.remove((row, col))
+        if not ships:
+            print("Поздравляю! ты снес все корабли противника")
+            break
     else:
-        print("Промах!")
+        print("Промашка!")
 
-    if all(cell == 'X' for row in board for cell in row):
-        print("победа")
-        break
+    print("очередь компьютера:")
+    row, col = computer_shot()
+    print("компьютер стреляет: ", row + 1, col + 1)
+    if check_shot(row, col):
+        print("компьютер попал")
+        board[row][col] = 'X'
+        ships.remove((row, col))
+        if not ships:
+            print("поражение, компьютер сбил все твои корабли")
+            break
+    else:
+        print("компьютер промазал")
